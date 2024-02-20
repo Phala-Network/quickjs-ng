@@ -2078,7 +2078,9 @@ JSContext *JS_NewContext(JSRuntime *rt)
     JS_AddIntrinsicBigInt(ctx);
     JS_AddIntrinsicWeakRef(ctx);
 
-    // JS_AddPerformance(ctx);
+#ifdef CONFIG_PERF
+    JS_AddPerformance(ctx);
+#endif
 
     return ctx;
 }
@@ -51266,6 +51268,7 @@ JS_BOOL JS_IsGenericObject(JSValue v)
 #pragma GCC diagnostic pop
 
 /* Performance */
+#ifdef CONFIG_PERF
 
 static uint64_t js__now_ms(void)
 {
@@ -51295,6 +51298,8 @@ void JS_AddPerformance(JSContext *ctx)
                            JS_PROP_ENUMERABLE | JS_PROP_CONFIGURABLE);
     JS_FreeValue(ctx, performance);
 }
+
+#endif
 
 /* WeakRef */
 

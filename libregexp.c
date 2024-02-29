@@ -782,6 +782,8 @@ static int get_class_atom(REParseState *s, CharRange *cr,
                 if (ret == -2 && *p != '\0' && strchr("^$\\.*+?()[]{}|/", *p)) {
                     /* always valid to escape these characters */
                     goto normal_char;
+                } else if (inclass && c == '-') {
+                    goto normal_char;
                 } else if (s->is_unicode) {
                 invalid_escape:
                     return re_parse_error(s, "invalid escape sequence in regular expression");

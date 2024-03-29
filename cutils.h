@@ -414,7 +414,9 @@ uint64_t js__hrtime_ns(void);
 
 static inline size_t js__malloc_usable_size(const void *ptr)
 {
-#if defined(__APPLE__)
+#if defined(CONFIG_PINK_ALLOCATOR)
+    return 0;
+#elif defined(__APPLE__)
     return malloc_size(ptr);
 #elif defined(_WIN32)
     return _msize((void *)ptr);

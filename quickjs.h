@@ -647,6 +647,7 @@ EXPORT static inline const char *JS_ToCString(JSContext *ctx, JSValue val1)
     return JS_ToCStringLen2(ctx, NULL, val1, 0);
 }
 JS_EXTERN void JS_FreeCString(JSContext *ctx, const char *ptr);
+JSValue JS_CStringOuterValue(JSContext *ctx, const char *ptr);
 
 JS_EXTERN JSValue JS_NewObjectProtoClass(JSContext *ctx, JSValue proto, JSClassID class_id);
 JS_EXTERN JSValue JS_NewObjectClass(JSContext *ctx, int class_id);

@@ -3984,14 +3984,18 @@ go:
     return NULL;
 }
 
-void JS_FreeCString(JSContext *ctx, const char *ptr)
+JSValue JS_CStringOuterValue(JSContext *ctx, const char *ptr)
 {
     JSString *p;
     if (!ptr)
-        return;
-    /* purposely removing constness */
+        return JS_UNDEFINED;
     p = container_of(ptr, JSString, u);
-    JS_FreeValue(ctx, JS_MKPTR(JS_TAG_STRING, p));
+    return JS_MKPTR(JS_TAG_STRING, p);
+}
+
+void JS_FreeCString(JSContext *ctx, const char *ptr)
+{
+    JS_FreeValue(ctx, JS_CStringOuterValue(ctx, ptr));
 }
 
 static int memcmp16_8(const uint16_t *src1, const uint8_t *src2, int len)

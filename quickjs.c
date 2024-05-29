@@ -11557,7 +11557,10 @@ static __maybe_unused void JS_DumpValueShort(JSRuntime *rt,
         {
             JSFunctionBytecode *b = JS_VALUE_GET_PTR(val);
             char buf[ATOM_GET_STR_BUF_SIZE];
-            printf("[bytecode %s]", JS_AtomGetStrRT(rt, buf, sizeof(buf), b->func_name));
+            if (rt->gc_phase == JS_GC_PHASE_REMOVE_CYCLES && b->header.ref_count == 0)
+                printf("[bytecode [%d] <freed>]", b->func_name);
+            else
+                printf("[bytecode [%d] %s]", b->func_name, JS_AtomGetStrRT(rt, buf, sizeof(buf), b->func_name));
         }
         break;
     case JS_TAG_OBJECT:

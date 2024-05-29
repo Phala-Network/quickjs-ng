@@ -2136,8 +2136,14 @@ JSContext *JS_DupContext(JSContext *ctx)
     return ctx;
 }
 
+/* used by external */
+void JS_MarkContext(JSRuntime *rt, JSContext *ctx, JS_MarkFunc *mark_func)
+{
+    mark_func(rt, &ctx->header);
+}
+
 /* used by the GC */
-static void JS_MarkContext(JSRuntime *rt, JSContext *ctx,
+static void JS_GC_MarkContext(JSRuntime *rt, JSContext *ctx,
                            JS_MarkFunc *mark_func)
 {
     int i;
@@ -5589,7 +5595,7 @@ static void mark_children(JSRuntime *rt, JSGCObjectHeader *gp,
     case JS_GC_OBJ_TYPE_JS_CONTEXT:
         {
             JSContext *ctx = (JSContext *)gp;
-            JS_MarkContext(rt, ctx, mark_func);
+            JS_GC_MarkContext(rt, ctx, mark_func);
         }
         break;
     case JS_GC_OBJ_TYPE_CUSTOM:

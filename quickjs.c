@@ -205,6 +205,7 @@ struct JSRuntime {
     uintptr_t stack_limit; /* lower stack limit */
 
     JSValue current_exception;
+    uint32_t debug_flags;
     /* true if inside an out of memory error, to avoid recursing */
     BOOL in_out_of_memory : 8;
     /* and likewise if inside Error.prepareStackTrace() */
@@ -1672,6 +1673,16 @@ JSRuntime *JS_NewRuntime(void)
 void JS_SetMemoryLimit(JSRuntime *rt, size_t limit)
 {
     rt->malloc_state.malloc_limit = limit;
+}
+
+void JS_SetDebugFlags(JSRuntime *rt, uint32_t flags)
+{
+    rt->debug_flags = flags;
+}
+
+uint32_t JS_GetDebugFlags(JSRuntime *rt)
+{
+    return rt->debug_flags;
 }
 
 /* use -1 to disable automatic GC */
@@ -7063,7 +7074,7 @@ static int JS_AutoInitProperty(JSContext *ctx, JSObject *p, JSAtom prop,
     return 0;
 }
 
-JSValue JS_GetPropertyInternal2(JSContext *ctx, JSValue obj,
+JSValue JS_GetPropertyInternal2_impl(JSContext *ctx, JSValue obj,
                                JSAtom prop, JSValue this_obj,
                                JSInlineCache* ic, BOOL throw_ref_error)
 {
@@ -7213,6 +7224,21 @@ JSValue JS_GetPropertyInternal2(JSContext *ctx, JSValue obj,
     } else {
         return JS_UNDEFINED;
     }
+}
+
+JSValue JS_GetPropertyInternal2(JSContext *ctx, JSValue obj,
+                               JSAtom prop, JSValue this_obj,
+                               JSInlineCache* ic, BOOL throw_ref_error)
+{
+    JSValue val = JS_GetPropertyInternal2_impl(ctx, obj, prop, this_obj, ic, throw_ref_error);
+    JSRuntime *rt = ctx->rt;
+    if (unlikely(rt->debug_flags & JS_DF_DUMP_UNDEFINED_PROPS)) {
+        if (unlikely(JS_IsUndefined(val))) {
+            char buf[ATOM_GET_STR_BUF_SIZE];
+            fprintf(stderr, "property '%s' not found\n", JS_AtomGetStr(ctx, buf, sizeof(buf), prop));
+        }
+    }
+    return val;
 }
 
 JSValue JS_GetPropertyInternal(JSContext *ctx, JSValue obj,
@@ -16840,6 +16866,12 @@ static JSValue JS_CallInternal(JSContext *caller_ctx, JSValue func_obj,
            operation */
         sf->cur_pc = pc;
         build_backtrace(ctx, rt->current_exception, NULL, 0, 0, 0);
+    }
+    if (unlikely(rt->debug_flags & JS_DF_DUMP_EXCEPTIONS)) {
+        fprintf(stderr, "\n==============[Exception]==============\n");
+        void js_dump_exception(JSContext *ctx, JSValueConst exception_val);
+        js_dump_exception(ctx, rt->current_exception);
+        fprintf(stderr, "---------------------------------------\n\n");
     }
     if (!JS_IsUncatchableError(ctx, rt->current_exception)) {
         while (sp > stack_buf) {

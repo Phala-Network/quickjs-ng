@@ -52014,3 +52014,9 @@ static void _JS_AddIntrinsicCallSite(JSContext *ctx)
                                js_callsite_proto_funcs,
                                countof(js_callsite_proto_funcs));
 }
+
+JSValue JS_TypeOf(JSContext *ctx, JSValue value)
+{
+    JSAtom atom = js_operator_typeof(ctx, value);
+    return __JS_AtomToValue(ctx, atom, TRUE);
+}

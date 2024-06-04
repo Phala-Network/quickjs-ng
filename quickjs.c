@@ -196,6 +196,7 @@ struct JSRuntime {
     struct list_head tmp_obj_list; /* used during GC */
     JSGCPhaseEnum gc_phase : 8;
     size_t malloc_gc_threshold;
+    size_t gc_paused;
 #ifdef DUMP_LEAKS
     struct list_head string_list; /* list of JSString.link */
 #endif
@@ -1270,6 +1271,9 @@ static JSValue js_dup(JSValue v)
 static void js_trigger_gc(JSRuntime *rt, size_t size)
 {
     BOOL force_gc;
+    if (rt->gc_paused > 0) {
+        return;
+    }
 #ifdef FORCE_GC_AT_MALLOC
     force_gc = TRUE;
 #else
@@ -5737,6 +5741,14 @@ static void gc_free_cycles(JSRuntime *rt)
     }
 
     init_list_head(&rt->gc_zero_ref_count_list);
+}
+
+void JS_PauseGC(JSRuntime *rt) {
+    rt->gc_paused++;
+}
+
+void JS_ResumeGC(JSRuntime *rt) {
+    rt->gc_paused--;
 }
 
 void JS_RunGC(JSRuntime *rt)

@@ -311,6 +311,8 @@ JS_EXTERN JSRuntime *JS_NewRuntime(void);
 JS_EXTERN void JS_SetRuntimeInfo(JSRuntime *rt, const char *info);
 JS_EXTERN void JS_SetMemoryLimit(JSRuntime *rt, size_t limit);
 JS_EXTERN void JS_SetGCThreshold(JSRuntime *rt, size_t gc_threshold);
+JS_EXTERN void JS_PauseGC(JSRuntime *rt);
+JS_EXTERN void JS_ResumeGC(JSRuntime *rt);
 JS_EXTERN void JS_SetDebugFlags(JSRuntime *rt, uint32_t flags);
 JS_EXTERN uint32_t JS_GetDebugFlags(JSRuntime *rt);
 /* use 0 to disable maximum stack size check */

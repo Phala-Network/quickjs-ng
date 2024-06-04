@@ -51265,16 +51265,21 @@ void JS_AddIntrinsicTypedArrays(JSContext *ctx)
 #endif
 }
 
-JS_BOOL JS_IsUint8Array(JSValue v)
+JS_BOOL JS_IsTypeOf(JSValue v, uint16_t class_id)
 {
     JSObject *p;
     if (JS_VALUE_GET_TAG(v) != JS_TAG_OBJECT)
         return FALSE;
     p = JS_VALUE_GET_OBJ(v);
-    if (p->class_id != JS_CLASS_UINT8_ARRAY) {
+    if (p->class_id != class_id) {
         return FALSE;
     }
     return TRUE;
+}
+
+JS_BOOL JS_IsUint8Array(JSValue v)
+{
+    return JS_IsTypeOf(v, JS_CLASS_UINT8_ARRAY);
 }
 
 uint8_t* JS_Uint8ArrayGetBuffer(JSValue v, size_t *size)

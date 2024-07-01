@@ -6424,6 +6424,10 @@ static void build_backtrace(JSContext *ctx, JSValue error_obj,
     uint32_t i;
     int stack_trace_limit;
 
+    if (JS_VALUE_GET_TAG(error_obj) != JS_TAG_OBJECT) {
+        return;
+    }
+
     stack_trace_limit = ctx->error_stack_trace_limit;
     stack_trace_limit = min_int(stack_trace_limit, countof(csd));
     stack_trace_limit = max_int(stack_trace_limit, 0);
@@ -27175,6 +27179,9 @@ static const char *skip_lines(const char *p, int n) {
 }
 
 static void print_lines(const char *source, int line, int line1) {
+    if (!source) {
+        return;
+    }
     const char *s = source;
     const char *p = skip_lines(s, line);
     if (*p) {

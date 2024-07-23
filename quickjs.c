@@ -6435,7 +6435,7 @@ static void build_backtrace(JSContext *ctx, JSValue error_obj,
     has_prepare = FALSE;
     i = 0;
 
-    if (!rt->in_prepare_stack_trace && !JS_IsNull(ctx->error_ctor)) {
+    if (!rt->in_prepare_stack_trace && !JS_IsNull(ctx->error_ctor) && !(rt->debug_flags & JS_DF_DUMP_EXCEPTIONS)) {
         prepare = js_dup(ctx->error_prepare_stack);
         has_prepare = JS_IsFunction(ctx, prepare);
         rt->in_prepare_stack_trace = TRUE;

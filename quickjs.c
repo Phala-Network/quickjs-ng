@@ -20475,7 +20475,8 @@ static int __exception js_parse_property_name(JSParseState *s,
             if (next_token(s))
                 goto fail1;
             if (s->token.val == ':' || s->token.val == ',' ||
-                s->token.val == '}' || s->token.val == '(') {
+                s->token.val == '}' || s->token.val == '(' ||
+                s->token.val == '=' || s->token.val == ';') {
                 is_non_reserved_ident = TRUE;
                 goto ident_found;
             }
@@ -20491,7 +20492,8 @@ static int __exception js_parse_property_name(JSParseState *s,
             if (next_token(s))
                 goto fail1;
             if (s->token.val == ':' || s->token.val == ',' ||
-                s->token.val == '}' || s->token.val == '(') {
+                s->token.val == '}' || s->token.val == '(' ||
+                s->token.val == '=' || s->token.val == ';') {
                 is_non_reserved_ident = TRUE;
                 goto ident_found;
             }
